@@ -1,5 +1,7 @@
 import React from 'react'
+import { useState, useEffect } from 'react'
 import { useAuth } from '../contexts/AuthContext'
+import { getDashboardStats } from '../lib/database'
 import {
   BookOpenIcon,
   UserGroupIcon,
@@ -11,37 +13,63 @@ import {
 
 const Dashboard = () => {
   const { user } = useAuth()
+  const [stats, setStats] = useState({})
+  const [loading, setLoading] = useState(true)
   const userRole = user?.user_metadata?.role || 'student'
   const userName = user?.user_metadata?.full_name || user?.email
+
+  useEffect(() => {
+    const loadStats = async () => {
+      try {
+        const { data, error } = await getDashboardStats()
+        if (!error) {
+          setStats(data)
+        }
+      } catch (error) {
+        console.error('Error loading dashboard stats:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadStats()
+  }, [])
 
   const getStatsForRole = () => {
     switch (userRole) {
       case 'admin':
         return [
-          { name: 'Total Users', value: '1,234', icon: UserGroupIcon, color: 'bg-blue-500' },
-          { name: 'Active Courses', value: '56', icon: BookOpenIcon, color: 'bg-green-500' },
-          { name: 'Revenue', value: '$12,345', icon: ChartBarIcon, color: 'bg-purple-500' },
-          { name: 'Completion Rate', value: '87%', icon: TrophyIcon, color: 'bg-yellow-500' },
+          { name: 'Total Users', value: stats.totalUsers || '0', icon: UserGroupIcon, color: 'bg-blue-500' },
+          { name: 'Active Courses', value: stats.activeCourses || '0', icon: BookOpenIcon, color: 'bg-green-500' },
+          { name: 'Revenue', value: stats.revenue || '$0', icon: ChartBarIcon, color: 'bg-purple-500' },
+          { name: 'Completion Rate', value: stats.completionRate || '0%', icon: TrophyIcon, color: 'bg-yellow-500' },
         ]
       case 'instructor':
         return [
-          { name: 'My Courses', value: '8', icon: BookOpenIcon, color: 'bg-blue-500' },
-          { name: 'Students', value: '234', icon: UserGroupIcon, color: 'bg-green-500' },
-          { name: 'Assignments', value: '12', icon: ClockIcon, color: 'bg-purple-500' },
-          { name: 'Avg Rating', value: '4.8', icon: TrophyIcon, color: 'bg-yellow-500' },
+          { name: 'My Courses', value: stats.myCourses || '0', icon: BookOpenIcon, color: 'bg-blue-500' },
+          { name: 'Students', value: stats.students || '0', icon: UserGroupIcon, color: 'bg-green-500' },
+          { name: 'Assignments', value: stats.assignments || '0', icon: ClockIcon, color: 'bg-purple-500' },
+          { name: 'Avg Rating', value: stats.avgRating || '0', icon: TrophyIcon, color: 'bg-yellow-500' },
         ]
       default: // student
         return [
-          { name: 'Enrolled Courses', value: '6', icon: BookOpenIcon, color: 'bg-blue-500' },
-          { name: 'Completed', value: '4', icon: AcademicCapIcon, color: 'bg-green-500' },
-          { name: 'In Progress', value: '2', icon: ClockIcon, color: 'bg-purple-500' },
-          { name: 'Certificates', value: '3', icon: TrophyIcon, color: 'bg-yellow-500' },
+          { name: 'Enrolled Courses', value: stats.enrolledCourses || '0', icon: BookOpenIcon, color: 'bg-blue-500' },
+          { name: 'Completed', value: stats.completedCourses || '0', icon: AcademicCapIcon, color: 'bg-green-500' },
+          { name: 'In Progress', value: stats.inProgress || '0', icon: ClockIcon, color: 'bg-purple-500' },
+          { name: 'Certificates', value: stats.certificates || '0', icon: TrophyIcon, color: 'bg-yellow-500' },
         ]
     }
   }
 
-  const stats = getStatsForRole()
+  const statsData = getStatsForRole()
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    )
+  }
   const recentActivities = [
     { id: 1, action: 'Completed', item: 'React Fundamentals - Chapter 5', time: '2 hours ago' },
     { id: 2, action: 'Started', item: 'Advanced JavaScript Course', time: '1 day ago' },
@@ -69,7 +97,7 @@ const Dashboard = () => {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {stats.map((stat) => (
+        {statsData.map((stat) => (
           <div key={stat.name} className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center">
               <div className={`${stat.color} rounded-lg p-3`}>
