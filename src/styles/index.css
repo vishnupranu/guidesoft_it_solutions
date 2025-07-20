@@ -1,0 +1,73 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Color system */
+  --color-border: #e2e8f0; /* slate-200 */
+  --color-input: #ffffff; /* white */
+  --color-ring: #3b82f6; /* blue-500 */
+  --color-background: #ffffff; /* white */
+  --color-foreground: #0f172a; /* slate-900 */
+  
+  --color-primary: #1e40af; /* blue-800 */
+  --color-primary-foreground: #ffffff; /* white */
+  
+  --color-secondary: #64748b; /* slate-500 */
+  --color-secondary-foreground: #ffffff; /* white */
+  
+  --color-destructive: #dc2626; /* red-600 */
+  --color-destructive-foreground: #ffffff; /* white */
+  
+  --color-muted: #f8fafc; /* slate-50 */
+  --color-muted-foreground: #475569; /* slate-600 */
+  
+  --color-accent: #3b82f6; /* blue-500 */
+  --color-accent-foreground: #ffffff; /* white */
+  
+  --color-popover: #ffffff; /* white */
+  --color-popover-foreground: #0f172a; /* slate-900 */
+  
+  --color-card: #ffffff; /* white */
+  --color-card-foreground: #0f172a; /* slate-900 */
+  
+  --color-success: #059669; /* emerald-600 */
+  --color-success-foreground: #ffffff; /* white */
+  
+  --color-warning: #d97706; /* amber-600 */
+  --color-warning-foreground: #ffffff; /* white */
+  
+  --color-error: #dc2626; /* red-600 */
+  --color-error-foreground: #ffffff; /* white */
+  
+  --radius: 0.5rem;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background;
+  }
+  
+  .btn-primary {
+    @apply bg-primary text-primary-foreground hover:bg-primary/90;
+  }
+  
+  .btn-secondary {
+    @apply bg-secondary text-secondary-foreground hover:bg-secondary/80;
+  }
+  
+  .card {
+    @apply rounded-lg border bg-card text-card-foreground shadow-sm;
+  }
+}
