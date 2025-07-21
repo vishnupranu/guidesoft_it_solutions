@@ -8,7 +8,8 @@ import {
   StarIcon,
   ClockIcon,
   UserGroupIcon,
-  PlayIcon
+  PlayIcon,
+  BookOpenIcon
 } from '@heroicons/react/24/outline'
 
 const Courses = () => {
