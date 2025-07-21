@@ -11,9 +11,22 @@ export const signUp = async (email, password, userData) => {
     email,
     password,
     options: {
-      data: userData
+      data: {
+        full_name: userData.full_name || userData.fullName,
+        role: userData.role || 'student'
+      }
     }
   })
+  
+  // If signup successful but no user returned, it might be email confirmation required
+  if (!error && !data.user) {
+    return { 
+      data, 
+      error: null,
+      message: 'Please check your email to confirm your account'
+    }
+  }
+  
   return { data, error }
 }
 

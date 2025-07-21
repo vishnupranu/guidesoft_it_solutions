@@ -17,14 +17,23 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     // Get initial session
-    getCurrentUser().then((user) => {
-      setUser(user)
-      setLoading(false)
-    })
+    const initializeAuth = async () => {
+      try {
+        const user = await getCurrentUser()
+        setUser(user)
+      } catch (error) {
+        console.error('Auth initialization error:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    
+    initializeAuth()
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        console.log('Auth state changed:', event, session?.user?.id)
         setUser(session?.user ?? null)
         setLoading(false)
       }
@@ -36,11 +45,19 @@ export const AuthProvider = ({ children }) => {
   const value = {
     user,
     loading,
-    signUp: (email, password, userData) => supabase.auth.signUp({
-      email,
-      password,
-      options: { data: userData }
-    }),
+    signUp: async (email, password, userData) => {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: { 
+          data: {
+            full_name: userData.full_name || userData.fullName,
+            role: userData.role || 'student'
+          }
+        }
+      })
+      return { data, error }
+    },
     signIn: (email, password) => supabase.auth.signInWithPassword({
       email,
       password

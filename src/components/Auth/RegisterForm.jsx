@@ -15,18 +15,25 @@ const RegisterForm = () => {
   const onSubmit = async (data) => {
     setLoading(true)
     try {
-      const { error } = await signUp(data.email, data.password, {
+      const { data: result, error, message } = await signUp(data.email, data.password, {
         full_name: data.fullName,
         role: data.role
       })
       
       if (error) {
-        toast.error(error.message)
+        if (error.message.includes('Database error')) {
+          toast.error('Registration failed. Please try again.')
+        } else {
+          toast.error(error.message)
+        }
+      } else if (message) {
+        toast.success(message)
       } else {
         toast.success('Account created successfully!')
         navigate('/dashboard')
       }
     } catch (error) {
+      console.error('Registration error:', error)
       toast.error('An error occurred during registration')
     } finally {
       setLoading(false)
